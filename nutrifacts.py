@@ -8,6 +8,7 @@ import requests
 import json
 
 BS = 16
+iv = "\0" * 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 unpad = lambda s : s[0:-ord(s[-1])]
 
@@ -54,8 +55,9 @@ def _data_generator(gtin, lang, token, deviceId, dateTime):
 
 def get_product(gtin, lang, deviceId):
     token = _token_generator()
-    request_cipher = AES.new(encryption_key, mode=AES.MODE_CBC)
-    response_cipher = AES.new(token, mode=AES.MODE_CBC)
+
+    request_cipher = AES.new(encryption_key, mode=AES.MODE_CBC, IV=iv)
+    response_cipher = AES.new(token, mode=AES.MODE_CBC, IV=iv)
 
     data = _data_generator(gtin=gtin, lang=lang, token=token, deviceId=deviceId, dateTime=str(datetime.utcnow()).replace(' ', 'T'))
     encoded = EncodeAES(request_cipher, data)
